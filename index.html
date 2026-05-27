@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signal AI - Sniper V3</title>
+    <title>Signal AI - Sniper V3.1</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -16,7 +16,7 @@
             align-items: center;
             padding: 20px;
         }
-    .container {
+  .container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border-radius: 20px;
@@ -34,13 +34,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-    .subtitle {
+  .subtitle {
             text-align: center;
             opacity: 0.6;
             font-size: 12px;
             margin-bottom: 25px;
         }
-    .card { margin-bottom: 20px; }
+  .card { margin-bottom: 20px; }
         label {
             display: block;
             margin-bottom: 8px;
@@ -77,40 +77,48 @@
             background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             text-align: center;
-            min-height: 140px;
+            min-height: 160px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
         }
-    .warning {
+  .warning {
             font-size: 11px;
             opacity: 0.5;
             text-align: center;
             margin-top: 15px;
         }
-    .signal-mode {
+  .signal-mode {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-    .signal-mode button {
+  .signal-mode button {
             flex: 1;
             padding: 10px;
             font-size: 14px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
         }
-    .signal-mode button.active {
+  .signal-mode button.active {
             background: linear-gradient(90deg, #00ff88, #00aaff);
             color: #000;
+        }
+  .quality-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>SIGNAL AI</h1>
-        <div class="subtitle">Sniper V3 - 27 Pairs | Aggressive Mode</div>
+        <div class="subtitle">Sniper V3.1 - 31 Pairs | Night Trading Ready</div>
 
         <div class="card">
             <label>Pick a pair</label>
@@ -126,16 +134,19 @@
                 <option value="EUR/GBP">EUR/GBP</option>
                 <option value="EUR/CHF">EUR/CHF</option>
                 <option value="GBP/CHF">GBP/CHF</option>
-                <option value="AUD/JPY">AUD/JPY</option>
+                <option value="AUD/JPY">AUD/JPY - Asian Night 🔥</option>
                 <option value="AUD/CHF">AUD/CHF</option>
                 <option value="AUD/CAD">AUD/CAD</option>
+                <option value="AUD/NZD">AUD/NZD - Asian Night 🔥</option>
                 <option value="CAD/JPY">CAD/JPY</option>
                 <option value="CHF/JPY">CHF/JPY</option>
                 <option value="CAD/CHF">CAD/CHF</option>
                 <option value="GBP/CAD">GBP/CAD</option>
                 <option value="GBP/AUD">GBP/AUD</option>
                 <option value="EUR/AUD">EUR/AUD</option>
+                <option value="EUR/CAD">EUR/CAD</option>
                 <option value="NZD/USD">NZD/USD - Kiwi</option>
+                <option value="NZD/JPY">NZD/JPY - Asian Night 🔥</option>
                 <option value="XAU/USD" selected>XAU/USD - GOLD 🔥</option>
                 <option value="BTC/USD">BTC/USD - BITCOIN 🚀</option>
                 <option value="ETH/USD">ETH/USD - ETHEREUM 💎</option>
@@ -171,13 +182,12 @@
 
         <div id="result">Select pair & timeframe, then press Analyze</div>
 
-        <div class="warning">Safe: 3/5 indicators | Aggressive: 2/5 indicators</div>
+        <div class="warning">Enter only: 60%+ Safe | 40%+ Aggressive + Strong Trend</div>
     </div>
 
     <script>
-        // REPLACE THIS WITH YOUR TWELVEDATA API KEY
         const API_KEY = 'ca4df2aa10dc40989e18550a74c7b24e';
-        let signalMode = 'aggressive'; // Default to aggressive for more signals
+        let signalMode = 'aggressive';
 
         function setMode(mode) {
             signalMode = mode;
@@ -298,35 +308,28 @@
                 const highs = data.values.map(v => parseFloat(v.high)).reverse();
                 const lows = data.values.map(v => parseFloat(v.low)).reverse();
 
-                // 1. EMA Cross
                 const ema9 = calculateEMA(closes, 9);
                 const ema21 = calculateEMA(closes, 21);
                 const emaSignal = ema9[ema9.length-1] > ema21[ema21.length-1]? 'BUY' : 'SELL';
 
-                // 2. RSI - Loosened to 35/65
                 const rsi = calculateRSI(closes, 14);
                 const lastRSI = rsi[rsi.length-1];
                 const rsiSignal = lastRSI < 35? 'BUY' : lastRSI > 65? 'SELL' : 'HOLD';
 
-                // 3. MACD
                 const macd = calculateMACD(closes);
                 const macdSignal = macd.histogram[macd.histogram.length-1] > 0? 'BUY' : 'SELL';
 
-                // 4. Bollinger Bands
                 const bb = calculateBB(closes, 20);
                 const price = closes[closes.length-1];
                 const bbSignal = price < bb.lower[bb.lower.length-1]? 'BUY' : price > bb.upper[bb.upper.length-1]? 'SELL' : 'HOLD';
 
-                // 5. Stochastic - Loosened to 25/75
                 const stoch = calculateStochastic(highs, lows, closes, 14);
                 const lastStoch = stoch.k[stoch.k.length-1];
                 const stochSignal = lastStoch < 25? 'BUY' : lastStoch > 75? 'SELL' : 'HOLD';
 
-                // 6. ADX - Trend Strength
                 const adx = calculateADX(highs, lows, closes, 14);
                 const trendStrength = adx > 25? 'STRONG' : adx > 20? 'MEDIUM' : 'WEAK';
 
-                // Count votes
                 const signals = [emaSignal, rsiSignal, macdSignal, bbSignal, stochSignal];
                 const buyVotes = signals.filter(s => s === 'BUY').length;
                 const sellVotes = signals.filter(s => s === 'SELL').length;
@@ -336,26 +339,46 @@
                 let finalSignal = 'HOLD';
                 let strength = 0;
                 let color = '#ffaa00';
+                let quality = 'WEAK SIGNAL';
+                let qualityColor = '#ff4444';
+                let canEnter = false;
 
                 if(buyVotes >= requiredVotes) {
                     finalSignal = 'BUY';
                     strength = Math.round((buyVotes/5)*100);
                     color = '#00ff88';
+                    if(strength >= 60 || (strength >= 40 && adx >= 20)) {
+                        quality = 'STRONG SIGNAL ✅';
+                        qualityColor = '#00ff88';
+                        canEnter = true;
+                    } else {
+                        quality = 'WEAK SIGNAL ⚠️';
+                        qualityColor = '#ffaa00';
+                    }
                 } else if(sellVotes >= requiredVotes) {
                     finalSignal = 'SELL';
                     strength = Math.round((sellVotes/5)*100);
                     color = '#ff4444';
+                    if(strength >= 60 || (strength >= 40 && adx >= 20)) {
+                        quality = 'STRONG SIGNAL ✅';
+                        qualityColor = '#ff4444';
+                        canEnter = true;
+                    } else {
+                        quality = 'WEAK SIGNAL ⚠️';
+                        qualityColor = '#ffaa00';
+                    }
                 }
 
                 result.innerHTML = `
-                    <div style="color:${color}; font-size:32px; font-weight:bold; margin-bottom:8px;">${finalSignal}</div>
-                    <div style="font-size:16px; margin-bottom:10px;">Strength: ${strength}% | Trend: ${trendStrength}</div>
+                    <div style="color:${color}; font-size:32px; font-weight:bold; margin-bottom:5px;">${finalSignal}</div>
+                    <div class="quality-badge" style="background:${qualityColor}; color:#000;">${quality}</div>
+                    <div style="font-size:16px; margin:10px 0;">Strength: ${strength}% | Trend: ${trendStrength}</div>
                     <div style="font-size:10px; opacity:0.8; line-height:1.5;">
                         EMA: ${emaSignal} | RSI: ${lastRSI.toFixed(0)} ${rsiSignal} | MACD: ${macdSignal}<br>
                         BB: ${bbSignal} | Stoch: ${lastStoch.toFixed(0)} ${stochSignal} | ADX: ${adx.toFixed(0)}
                     </div>
-                    <div style="font-size:9px; opacity:0.5; margin-top:8px;">
-                        Mode: ${signalMode === 'aggressive'? 'Aggressive 2/5' : 'Safe 3/5'} | ${buyVotes}B ${sellVotes}S ${5-buyVotes-sellVotes}H
+                    <div style="font-size:11px; opacity:0.7; margin-top:8px; color:${canEnter?'#00ff88':'#ffaa00'};">
+                        ${canEnter?'✅ ENTER TRADE':'⚠️ WAIT FOR BETTER SIGNAL'}
                     </div>
                 `;
 
