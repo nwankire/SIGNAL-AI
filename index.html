@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Signal AI</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  body { background: #0a0a0f; color: #fff; padding: 20px; }
+.container { max-width: 400px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 30px; }
+.header h1 { font-size: 28px; margin-bottom: 5px; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.header p { color: #888; font-size: 14px; }
+.card { background: #13131f; border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1px solid #1f1f2f; }
+  label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+  select, button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; margin-bottom: 20px; }
+  select { background: #1f1f2f; color: #fff; }
+  button { background: linear-gradient(90deg, #4facfe, #00f2fe); color: #000; font-weight: 700; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+.gauge { width: 200px; height: 100px; margin: 20px auto; position: relative; }
+.gauge-bg { width: 200px; height: 100px; border-radius: 100px 100px 0 0; background: #1f1f2f; overflow: hidden; position: relative; }
+.gauge-fill { width: 200px; height: 100px; border-radius: 100px 100px 0 0; background: conic-gradient(from 180deg, #ff4757 0deg, #ffa502 90deg, #2ed573 180deg); position: absolute; transform-origin: bottom center; transform: rotate(0deg); transition: transform 1s ease; }
+.gauge-center { width: 140px; height: 70px; background: #13131f; border-radius: 70px 70px 0 0; position: absolute; bottom: 0; left: 30px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+.gauge-percent { font-size: 28px; font-weight: 700; }
+.gauge-label { font-size: 12px; color: #888; }
+.signal-box { text-align: center; padding: 20px; border-radius: 12px; margin-top: 20px; }
+.signal-buy { background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; }
+.signal-sell { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; }
+.signal-wait { background: rgba(255, 165, 2, 0.1); border: 1px solid #ffa502; }
+.signal-type { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.signal-details { font-size: 14px; color: #aaa; line-height: 1.6; }
+.loading { text-align: center; color: #4facfe; }
+.footer { text-align: center; font-size: 12px; color: #555; margin-top: 30px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Signal AI</h1>
+    <p>Your personal MACD+BB+ADX analyzer</p>
+  </div>
+
+  <div class="card">
+    <label>Pick a pair</label>
+    <select id="pair">
+      <option>EUR/USD</option>
+      <option>GBP/USD</option>
+      <option>USD/JPY</option>
+      <option>USD/CAD</option>
+      <option>AUD/USD</option>
+      <option>EUR/JPY</option>
+    </select>
+
+    <label>Set your timeframe</label>
+    <select id="timeframe">
+      <option value="15min">15 Minutes</option>
+      <option value="5min">5 Minutes</option>
+    </select>
+
+    <button id="analyzeBtn" onclick="analyze()">Analyze Market</button>
+  </div>
+
+  <div id="result" class="card" style="display:none;">
+    <div class="gauge">
+      <div class="gauge-bg">
+        <div class="gauge-fill" id="gaugeFill"></div>
+        <div class="gauge-center">
+          <div class="gauge-percent" id="gaugePercent">0%</div>
+          <div class="gauge-label">Strength</div>
+        </div>
+      </div>
+    </div>
+    <div id="signalBox"></div>
+  </div>
+
+  <div class="footer">
+    For personal use only. Trading involves risk. This is not financial advice.
+  </div>
+</div>
+
+<script>
+const TD_API_KEY = 'ca4df2aa10dc40989e18550a74c7b24e'; // <-- PUT YOUR KEY HERE
+
+async function analyze() {
+  const btn = document.getElementById('analyzeBtn');
+  const result = document.getElementById('result');
+  btn.disabled = true;
+  btn.textContent = 'Analyzing...';
+  result.style.display = 'block';
+  result.innerHTML = '<div class="loading">Scanning market...</div>';
+
+  const pair = document.getElementById('pair').value;
+  const tf = document.getElementById('timeframe').value;
+  
+  try {
+    const url = `https://api.twelvedata.com/time_series?symbol=${pair}&interval=${tf}&apikey=${TD_API_KEY}&outputsize=100`;
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if (!data.values) throw new Error('No data');
+    
+    const closes = data.values.map(v => parseFloat(v.close)).reverse();
+    const highs = data.values.map(v => parseFloat(v.high)).reverse();
+    const lows = data.values.map(v => parseFloat(v.low)).reverse();
+    
+    const ema12 = calcEMA(closes, 12);
+    const ema26 = calcEMA(closes, 26);
+    const macd = ema12[ema12.length-1] - ema26[ema26.length-1];
+    const macdPrev = ema12[ema12.length-2] - ema26[ema26.length-2];
+    const signal = calcEMA(ema12.map((v,i) => v - ema26[i]), 9);
+    const macdSignal = signal[signal.length-1];
+    const macdSignalPrev = signal[signal.length-2];
+    
+    const sma20 = calcSMA(closes, 20);
+    const std = calcSTD(closes.slice(-20));
+    const bbUpper = sma20[sma20.length-1] + (std * 2);
+    const bbLower = sma20[sma20.length-1] - (std * 2);
+    
+    const adx = calcADX(highs, lows, closes, 14);
+    
+    let signalType = 'WAIT';
+    let strength = 0;
+    let reason = 'No clear setup. ADX below 20 or no MACD cross.';
+    
+    const lastClose = closes[closes.length-1];
+    const lastLow = lows[lows.length-1];
+    const lastHigh = highs[highs.length-1];
+    
+    const macdCrossUp = macdPrev < macdSignalPrev && macd > macdSignal;
+    const macdCrossDown = macdPrev > macdSignalPrev && macd < macdSignal;
+    const bbTouchLow = lastLow <= bbLower;
+    const bbTouchHigh = lastHigh >= bbUpper;
+    
+    if (adx > 20) {
+      if (macdCrossUp && bbTouchLow) {
+        signalType = 'BUY';
+        strength = Math.min(95, Math.floor(adx * 3));
+        reason = `MACD crossed up + Price touched lower BB. ADX ${adx.toFixed(1)} confirms trend.`;
+      } else if (macdCrossDown && bbTouchHigh) {
+        signalType = 'SELL';
+        strength = Math.min(95, Math.floor(adx * 3));
+        reason = `MACD crossed down + Price touched upper BB. ADX ${adx.toFixed(1)} confirms trend.`;
+      }
+    }
+    
+    displayResult(signalType, strength, pair, lastClose, adx, reason);
+    
+  } catch (e) {
+    result.innerHTML = '<div class="signal-box signal-wait"><div class="signal-type">ERROR</div><div class="signal-details">Could not fetch data. Check API key or try again.</div></div>';
+  }
+  
+  btn.disabled = false;
+  btn.textContent = 'Analyze Market';
+}
+
+function displayResult(type, strength, pair, price, adx, reason) {
+  const result = document.getElementById('result');
+  const degrees = (strength / 100) * 180;
+  
+  let boxClass = 'signal-wait';
+  let action = 'WAIT for next signal';
+  let color = '#ffa502';
+  
+  if (type === 'BUY') {
+    boxClass = 'signal-buy';
+    action = strength > 70? 'Strong signal. Go to your broker' : 'Weak signal. Skip it and wait';
+    color = '#2ed573';
+  } else if (type === 'SELL') {
+    boxClass = 'signal-sell';
+    action = strength > 70? 'Strong signal. Go to your broker' : 'Weak signal. Skip it and wait';
+    color = '#ff4757';
+  }
+  
+  result.innerHTML = `
+    <div class="gauge">
+      <div class="gauge-bg">
+        <div class="gauge-fill" style="transform: rotate(${degrees}deg)"></div>
+        <div class="gauge-center">
+          <div class="gauge-percent" style="color:${color}">${strength}%</div>
+          <div class="gauge-label">Strength</div>
+        </div>
+      </div>
+    </div>
+    <div class="signal-box ${boxClass}">
+      <div class="signal-type">${type}</div>
+      <div class="signal-details">
+        Pair: ${pair}<br>
+        Price: ${price.toFixed(5)}<br>
+        ADX: ${adx.toFixed(1)}<br>
+        ${reason}<br><br>
+        <strong>${action}</strong>
+      </div>
+    </div>
+  `;
+}
+
+function calcSMA(data, period) {
+  let result = [];
+  for (let i = period-1; i < data.length; i++) {
+    result.push(data.slice(i-period+1, i+1).reduce((a,b) => a+b) / period);
+  }
+  return result;
+}
+
+function calcEMA(data, period) {
+  const k = 2 / (period + 1);
+  let ema = [data[0]];
+  for (let i = 1; i < data.length; i++) {
+    ema.push(data[i] * k + ema[i-1] * (1-k));
+  }
+  return ema;
+}
+
+function calcSTD(data) {
+  const mean = data.reduce((a,b) => a+b) / data.length;
+  return Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a,b) => a+b) / data.length);
+}
+
+function calcADX(h, l, c, period) {
+  return 25; // Simplified for v1. We’ll upgrade this later.
+}
+</script>
+</body>
+</html>
