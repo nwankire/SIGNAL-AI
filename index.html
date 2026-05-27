@@ -1,227 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Personal Signal AI</title>
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-  body { background: #0a0a0f; color: #fff; padding: 20px; }
-.container { max-width: 400px; margin: 0 auto; }
-.header { text-align: center; margin-bottom: 30px; }
-.header h1 { font-size: 28px; margin-bottom: 5px; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.header p { color: #888; font-size: 14px; }
-.card { background: #13131f; border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 1px solid #1f1f2f; }
-  label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
-  select, button { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; margin-bottom: 20px; }
-  select { background: #1f1f2f; color: #fff; }
-  button { background: linear-gradient(90deg, #4facfe, #00f2fe); color: #000; font-weight: 700; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-.gauge { width: 200px; height: 100px; margin: 20px auto; position: relative; }
-.gauge-bg { width: 200px; height: 100px; border-radius: 100px 100px 0 0; background: #1f1f2f; overflow: hidden; position: relative; }
-.gauge-fill { width: 200px; height: 100px; border-radius: 100px 100px 0 0; background: conic-gradient(from 180deg, #ff4757 0deg, #ffa502 90deg, #2ed573 180deg); position: absolute; transform-origin: bottom center; transform: rotate(0deg); transition: transform 1s ease; }
-.gauge-center { width: 140px; height: 70px; background: #13131f; border-radius: 70px 70px 0 0; position: absolute; bottom: 0; left: 30px; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-.gauge-percent { font-size: 28px; font-weight: 700; }
-.gauge-label { font-size: 12px; color: #888; }
-.signal-box { text-align: center; padding: 20px; border-radius: 12px; margin-top: 20px; }
-.signal-buy { background: rgba(46, 213, 115, 0.1); border: 1px solid #2ed573; }
-.signal-sell { background: rgba(255, 71, 87, 0.1); border: 1px solid #ff4757; }
-.signal-wait { background: rgba(255, 165, 2, 0.1); border: 1px solid #ffa502; }
-.signal-type { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
-.signal-details { font-size: 14px; color: #aaa; line-height: 1.6; }
-.loading { text-align: center; color: #4facfe; }
-.footer { text-align: center; font-size: 12px; color: #555; margin-top: 30px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signal AI - Sniper Mode</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+       .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+            background: linear-gradient(90deg, #00ff88, #00aaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+       .subtitle {
+            text-align: center;
+            opacity: 0.6;
+            font-size: 12px;
+            margin-bottom: 25px;
+        }
+       .card {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+        }
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #00ff88, #00aaff);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        #result {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+       .warning {
+            font-size: 11px;
+            opacity: 0.5;
+            text-align: center;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <h1>Signal AI</h1>
-    <p>Your personal MACD+BB+ADX analyzer</p>
-  </div>
-
-  <div class="card">
-    <label>Pick a pair</label>
-    <select id="pair">
-    <option value="EUR/USD">EUR/USD</option>
-    <option value="GBP/USD">GBP/USD</option>
-    <option value="USD/JPY">USD/JPY</option>
-    <option value="USD/CAD">USD/CAD</option>
-    <option value="AUD/USD">AUD/USD</option>
-    <option value="EUR/JPY">EUR/JPY</option>
-    <option value="XAU/USD">XAU/USD - Gold</option>
-    <option value="BTC/USD">BTC/USD - Bitcoin</option>
-    <option value="NAS100">NAS100 - Nasdaq</option>
-</select>
-
-    <label>Set your timeframe</label>
-    <select id="timeframe">
-      <option value="15min">15 Minutes</option>
-      <option value="5min">5 Minutes</option>
-    </select>
-
-    <button id="analyzeBtn" onclick="analyze()">Analyze Market</button>
-  </div>
-
-  <div id="result" class="card" style="display:none;">
-    <div class="gauge">
-      <div class="gauge-bg">
-        <div class="gauge-fill" id="gaugeFill"></div>
-        <div class="gauge-center">
-          <div class="gauge-percent" id="gaugePercent">0%</div>
-          <div class="gauge-label">Strength</div>
+    <div class="container">
+        <h1>SIGNAL AI</h1>
+        <div class="subtitle">Sniper Mode - Multi Indicator</div>
+        
+        <div class="card">
+            <label>Pick a pair</label>
+            <select id="pair">
+                <option value="EUR/USD">EUR/USD</option>
+                <option value="GBP/USD">GBP/USD</option>
+                <option value="USD/JPY">USD/JPY</option>
+                <option value="USD/CAD">USD/CAD</option>
+                <option value="AUD/USD">AUD/USD</option>
+                <option value="EUR/JPY">EUR/JPY</option>
+                <option value="GBP/JPY">GBP/JPY</option>
+                <option value="XAU/USD">XAU/USD - Gold</option>
+                <option value="BTC/USD">BTC/USD - Bitcoin</option>
+                <option value="ETH/USD">ETH/USD - Ethereum</option>
+                <option value="NAS100">NAS100 - Nasdaq</option>
+                <option value="SPX">SPX - S&P 500</option>
+                <option value="USOIL">USOIL - Oil</option>
+                <option value="EUR/GBP">EUR/GBP</option>
+                <option value="NZD/USD">NZD/USD</option>
+            </select>
         </div>
-      </div>
-    </div>
-    <div id="signalBox"></div>
-  </div>
 
-  <div class="footer">
-    For personal use only. Trading involves risk. This is not financial advice.
-  </div>
-</div>
-
-<script>
-const TD_API_KEY = 'ca4df2aa10dc40989e18550a74c7b24e'; // <-- PUT YOUR KEY HERE
-
-async function analyze() {
-  const btn = document.getElementById('analyzeBtn');
-  const result = document.getElementById('result');
-  btn.disabled = true;
-  btn.textContent = 'Analyzing...';
-  result.style.display = 'block';
-  result.innerHTML = '<div class="loading">Scanning market...</div>';
-
-  const pair = document.getElementById('pair').value;
-  const tf = document.getElementById('timeframe').value;
-  
-  try {
-    const url = `https://api.twelvedata.com/time_series?symbol=${pair}&interval=${tf}&apikey=${TD_API_KEY}&outputsize=100`;
-    const res = await fetch(url);
-    const data = await res.json();
-    
-    if (!data.values) throw new Error('No data');
-    
-    const closes = data.values.map(v => parseFloat(v.close)).reverse();
-    const highs = data.values.map(v => parseFloat(v.high)).reverse();
-    const lows = data.values.map(v => parseFloat(v.low)).reverse();
-    
-    const ema12 = calcEMA(closes, 12);
-    const ema26 = calcEMA(closes, 26);
-    const macd = ema12[ema12.length-1] - ema26[ema26.length-1];
-    const macdPrev = ema12[ema12.length-2] - ema26[ema26.length-2];
-    const signal = calcEMA(ema12.map((v,i) => v - ema26[i]), 9);
-    const macdSignal = signal[signal.length-1];
-    const macdSignalPrev = signal[signal.length-2];
-    
-    const sma20 = calcSMA(closes, 20);
-    const std = calcSTD(closes.slice(-20));
-    const bbUpper = sma20[sma20.length-1] + (std * 2);
-    const bbLower = sma20[sma20.length-1] - (std * 2);
-    
-    const adx = calcADX(highs, lows, closes, 14);
-    
-    let signalType = 'WAIT';
-    let strength = 0;
-    let reason = 'No clear setup. ADX below 20 or no MACD cross.';
-    
-    const lastClose = closes[closes.length-1];
-    const lastLow = lows[lows.length-1];
-    const lastHigh = highs[highs.length-1];
-    
-    const macdCrossUp = macdPrev < macdSignalPrev && macd > macdSignal;
-    const macdCrossDown = macdPrev > macdSignalPrev && macd < macdSignal;
-    const bbTouchLow = lastLow <= bbLower;
-    const bbTouchHigh = lastHigh >= bbUpper;
-    
-    if (adx > 20) {
-      if (macdCrossUp && bbTouchLow) {
-        signalType = 'BUY';
-        strength = Math.min(95, Math.floor(adx * 3));
-        reason = `MACD crossed up + Price touched lower BB. ADX ${adx.toFixed(1)} confirms trend.`;
-      } else if (macdCrossDown && bbTouchHigh) {
-        signalType = 'SELL';
-        strength = Math.min(95, Math.floor(adx * 3));
-        reason = `MACD crossed down + Price touched upper BB. ADX ${adx.toFixed(1)} confirms trend.`;
-      }
-    }
-    
-    displayResult(signalType, strength, pair, lastClose, adx, reason);
-    
-  } catch (e) {
-    result.innerHTML = '<div class="signal-box signal-wait"><div class="signal-type">ERROR</div><div class="signal-details">Could not fetch data. Check API key or try again.</div></div>';
-  }
-  
-  btn.disabled = false;
-  btn.textContent = 'Analyze Market';
-}
-
-function displayResult(type, strength, pair, price, adx, reason) {
-  const result = document.getElementById('result');
-  const degrees = (strength / 100) * 180;
-  
-  let boxClass = 'signal-wait';
-  let action = 'WAIT for next signal';
-  let color = '#ffa502';
-  
-  if (type === 'BUY') {
-    boxClass = 'signal-buy';
-    action = strength > 70? 'Strong signal. Go to your broker' : 'Weak signal. Skip it and wait';
-    color = '#2ed573';
-  } else if (type === 'SELL') {
-    boxClass = 'signal-sell';
-    action = strength > 70? 'Strong signal. Go to your broker' : 'Weak signal. Skip it and wait';
-    color = '#ff4757';
-  }
-  
-  result.innerHTML = `
-    <div class="gauge">
-      <div class="gauge-bg">
-        <div class="gauge-fill" style="transform: rotate(${degrees}deg)"></div>
-        <div class="gauge-center">
-          <div class="gauge-percent" style="color:${color}">${strength}%</div>
-          <div class="gauge-label">Strength</div>
+        <div class="card">
+            <label>Timeframe</label>
+            <select id="timeframe">
+                <option value="5s">5 Seconds</option>
+                <option value="10s">10 Seconds</option>
+                <option value="15s">15 Seconds</option>
+                <option value="30s">30 Seconds</option>
+                <option value="1min" selected>1 Minute</option>
+                <option value="2min">2 Minutes</option>
+                <option value="3min">3 Minutes</option>
+                <option value="5min">5 Minutes</option>
+                <option value="15min">15 Minutes</option>
+                <option value="1h">1 Hour</option>
+            </select>
         </div>
-      </div>
+
+        <button onclick="analyzeMarket()">Analyze Market</button>
+        
+        <div id="result">Select pair & timeframe, then press Analyze</div>
+        
+        <div class="warning">Note: 5s-30s timeframes need paid API. Use 1min+ for free plan.</div>
     </div>
-    <div class="signal-box ${boxClass}">
-      <div class="signal-type">${type}</div>
-      <div class="signal-details">
-        Pair: ${pair}<br>
-        Price: ${price.toFixed(5)}<br>
-        ADX: ${adx.toFixed(1)}<br>
-        ${reason}<br><br>
-        <strong>${action}</strong>
-      </div>
-    </div>
-  `;
-}
 
-function calcSMA(data, period) {
-  let result = [];
-  for (let i = period-1; i < data.length; i++) {
-    result.push(data.slice(i-period+1, i+1).reduce((a,b) => a+b) / period);
-  }
-  return result;
-}
+    <script>
+        // REPLACE THIS WITH YOUR TWELVEDATA API KEY
+        const API_KEY = 'YOUR_API_KEY_HERE';
+        
+        // EMA Calculation
+        function calculateEMA(data, period) {
+            const k = 2 / (period + 1);
+            let ema = [data[0]];
+            for(let i = 1; i < data.length; i++) {
+                ema.push(data[i] * k + ema[i-1] * (1 - k));
+            }
+            return ema;
+        }
 
-function calcEMA(data, period) {
-  const k = 2 / (period + 1);
-  let ema = [data[0]];
-  for (let i = 1; i < data.length; i++) {
-    ema.push(data[i] * k + ema[i-1] * (1-k));
-  }
-  return ema;
-}
+        // RSI Calculation
+        function calculateRSI(data, period) {
+            let gains = [], losses = [];
+            for(let i = 1; i < data.length; i++) {
+                const diff = data[i] - data[i-1];
+                gains.push(diff > 0? diff : 0);
+                losses.push(diff < 0? -diff : 0);
+            }
+            let avgGain = gains.slice(0, period).reduce((a,b) => a+b, 0) / period;
+            let avgLoss = losses.slice(0, period).reduce((a,b) => a+b, 0) / period;
+            let rsi = [100 - (100 / (1 + avgGain/avgLoss))];
+            
+            for(let i = period; i < gains.length; i++) {
+                avgGain = (avgGain * (period-1) + gains[i]) / period;
+                avgLoss = (avgLoss * (period-1) + losses[i]) / period;
+                avgLoss = avgLoss === 0? 0.0001 : avgLoss; // Prevent division by zero
+                rsi.push(100 - (100 / (1 + avgGain/avgLoss)));
+            }
+            return rsi;
+        }
 
-function calcSTD(data) {
-  const mean = data.reduce((a,b) => a+b) / data.length;
-  return Math.sqrt(data.map(x => Math.pow(x - mean, 2)).reduce((a,b) => a+b) / data.length);
-}
+        // MACD Calculation
+        function calculateMACD(data) {
+            const ema12 = calculateEMA(data, 12);
+            const ema26 = calculateEMA(data, 26);
+            const macdLine = ema12.map((v, i) => v - ema26[i]);
+            const signalLine = calculateEMA(macdLine.slice(26), 9);
+            const histogram = macdLine.slice(26 + 9 - 1).map((v, i) => v - signalLine[i]);
+            return { histogram: histogram };
+        }
 
-function calcADX(h, l, c, period) {
-  return 25; // Simplified for v1. We’ll upgrade this later.
-}
-</script>
+        // Bollinger Bands
+        function calculateBB(data, period) {
+            let upper = [], lower = [];
+            for(let i = period-1; i < data.length; i++) {
+                const slice = data.slice(i-period+1, i+1);
+                const sma = slice.reduce((a,b) => a+b) / period;
+                const std = Math.sqrt(slice.map(x => Math.pow(x - sma, 2)).reduce((a,b) => a+b) / period);
+                upper.push(sma + (std * 2));
+                lower.push(sma - (std * 2));
+            }
+            return { upper: upper, lower: lower };
+        }
+
+        // Stochastic
+        function calculateStochastic(highs, lows, closes, period) {
+            let k = [];
+            for(let i = period-1; i < closes.length; i++) {
+                const highMax = Math.max(...highs.slice(i-period+1, i+1));
+                const lowMin = Math.min(...lows.slice(i-period+1, i+1));
+                k.push(((closes[i] - lowMin) / (highMax - lowMin)) * 100);
+            }
+            return {k: k};
+        }
+
+        // Main Analysis Function
+        async function analyzeMarket() {
+            const pair = document.getElementById('pair').value;
+            const timeframe = document.getElementById('timeframe').value;
+            const result = document.getElementById('result');
+            
+            result.innerHTML = "Scanning Market...";
+            
+            try {
+                const url = `https://api.twelvedata.com/time_series?symbol=${pair}&interval=${timeframe}&outputsize=100&apikey=${API_KEY}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if(data.status === "error") {
+                    result.innerHTML = `<div style="color:#ff4444;">ERROR: ${data.message}<br><br><span style="font-size:12px;opacity:0.7;">${timeframe} not supported on free plan. Use 1min+</span></div>`;
+                    return;
+                }
+                
+                if(!data.values || data.values.length < 50) {
+                    result.innerHTML = `<div style="color:#ffaa00;">Not enough data for ${pair} ${timeframe}</div>`;
+                    return;
+                }
+                
+                const closes = data.values.map(v => parseFloat(v.close)).reverse();
+                const highs = data.values.map(v => parseFloat(v.high)).reverse();
+                const lows = data.values.map(v => parseFloat(v.low)).reverse();
+                
+                // 1. EMA Cross - 9 vs 21
+                const ema9 = calculateEMA(closes, 9);
+                const ema21 = calculateEMA(closes, 21);
+                const emaSignal = ema9[ema9.length-1] > ema21[ema21.length-1]? 'BUY' : 'SELL';
+                
+                // 2. RSI
+                const rsi = calculateRSI(closes, 14);
+                const lastRSI = rsi[rsi.length-1];
+                const rsiSignal = lastRSI < 30? 'BUY' : lastRSI > 70? 'SELL' : 'HOLD';
+                
+                // 3. MACD
+                const macd = calculateMACD(closes);
+                const macdSignal = macd.histogram[macd.histogram.length-1] > 0? 'BUY' : 'SELL';
+                
+                // 4. Bollinger Bands
+                const bb = calculateBB(closes, 20);
+                const price = closes[closes.length-1];
+                const bbSignal = price < bb.lower[bb.lower.length-1]? 'BUY' : price > bb.upper[bb.upper.length-1]? 'SELL' : 'HOLD';
+                
+                // 5. Stochastic
+                const stoch = calculateStochastic(highs, lows, closes, 14);
+                const lastStoch = stoch.k[stoch.k.length-1];
+                const stochSignal = lastStoch < 20? 'BUY' : lastStoch > 80? 'SELL' : 'HOLD';
+                
+                // Count votes - Need 3/5 to signal
+                const signals = [emaSignal, rsiSignal, macdSignal, bbSignal, stochSignal];
+                const buyVotes = signals.filter(s => s === 'BUY').length;
+                const sellVotes = signals.filter(s => s === 'SELL').length;
+                
+                let finalSignal = 'HOLD';
+                let strength = 0;
+                let color = '#ffaa00';
+                
+                if(buyVotes >= 3) {
+                    finalSignal = 'BUY';
+                    strength = Math.round((buyVotes/5)*100);
+                    color = '#00ff88';
+                } else if(sellVotes >= 3) {
+                    finalSignal = 'SELL';
+                    strength = Math.round((sellVotes/5)*100);
+                    color = '#ff4444';
+                }
+                
+                result.innerHTML = `
+                    <div style="color:${color}; font-size:32px; font-weight:bold; margin-bottom:10px;">${finalSignal}</div>
+                    <div style="font-size:18px; margin-bottom:15px;">Strength: ${strength}%</div>
+                    <div style="font-size:11px; opacity:0.8; line-height:1.6;">
+                        EMA9/21: ${emaSignal} | RSI: ${lastRSI.toFixed(0)} ${rsiSignal}<br>
+                        MACD: ${macdSignal} | BB: ${bbSignal} | Stoch: ${lastStoch.toFixed(0)} ${stochSignal}
+                    </div>
+                    <div style="font-size:10px; opacity:0.5; margin-top:10px;">
+                        ${buyVotes} BUY | ${sellVotes} SELL | ${5-buyVotes-sellVotes} HOLD
+                    </div>
+                `;
+                
+            } catch(error) {
+                result.innerHTML = `<div style="color:#ff4444;">ERROR: ${error.message}</div>`;
+            }
+        }
+    </script>
 </body>
 </html>
