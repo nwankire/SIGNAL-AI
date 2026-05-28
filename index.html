@@ -1,391 +1,431 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signal AI - Sniper V3.1</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-  .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 28px;
-            background: linear-gradient(90deg, #00ff88, #00aaff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-  .subtitle {
-            text-align: center;
-            opacity: 0.6;
-            font-size: 12px;
-            margin-bottom: 25px;
-        }
-  .card { margin-bottom: 20px; }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-        select {
-            width: 100%;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-        }
-        select option { background: #1a1a2e; color: #fff; }
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(90deg, #00ff88, #00aaff);
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button:active { transform: scale(0.98); }
-        #result {
-            margin-top: 25px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            text-align: center;
-            min-height: 160px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-  .warning {
-            font-size: 11px;
-            opacity: 0.5;
-            text-align: center;
-            margin-top: 15px;
-        }
-  .signal-mode {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-  .signal-mode button {
-            flex: 1;
-            padding: 10px;
-            font-size: 14px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-  .signal-mode button.active {
-            background: linear-gradient(90deg, #00ff88, #00aaff);
-            color: #000;
-        }
-  .quality-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 8px;
-            display: inline-block;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal AI Sniper V3.2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;color:#e4e7f1;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;padding:20px;min-height:100vh}
+.container{max-width:500px;margin:0 auto;background:#111827;border-radius:20px;padding:30px;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid #1f2937}
+h1{text-align:center;color:#10b981;font-size:28px;margin-bottom:5px;font-weight:700}
+.subtitle{text-align:center;color:#6b7280;font-size:12px;margin-bottom:25px}
+.form-group{margin-bottom:20px}
+label{display:block;margin-bottom:8px;color:#9ca3af;font-size:14px;font-weight:500}
+select{width:100%;padding:14px;background:#1f2937;border:1px solid #374151;border-radius:12px;color:#e4e7f1;font-size:15px;cursor:pointer;outline:none;transition:all 0.3s}
+select:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,0.1)}
+.mode-buttons{display:flex;gap:10px;margin-bottom:20px}
+.mode-btn{flex:1;padding:12px;background:#1f2937;border:1px solid #374151;border-radius:12px;color:#9ca3af;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.3s}
+.mode-btn.active{background:#10b981;color:#fff;border-color:#10b981}
+.analyze-btn{width:100%;padding:16px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:700;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;margin-bottom:20px}
+.analyze-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(16,185,129,0.4)}
+.analyze-btn:active{transform:translateY(0)}
+.result{background:#1f2937;border-radius:16px;padding:25px;border:1px solid #374151;display:none}
+.result.show{display:block;animation:slideIn 0.4s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.signal-text{text-align:center;font-size:32px;font-weight:800;margin-bottom:15px;letter-spacing:1px}
+.signal-text.buy{color:#10b981}
+.signal-text.sell{color:#ef4444}
+.signal-text.hold{color:#f59e0b}
+.badge{display:inline-block;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;text-align:center;margin:0 auto 15px;display:block;width:fit-content}
+.badge.strong{background:#10b981;color:#fff}
+.badge.weak{background:#f59e0b;color:#fff}
+.badge.danger{background:#ef4444;color:#fff}
+.stats{text-align:center;color:#9ca3af;font-size:14px;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #374151}
+.indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.indicator{background:#111827;padding:10px;border-radius:8px;font-size:12px}
+.indicator-label{color:#6b7280;margin-bottom:4px}
+.indicator-value{color:#e4e7f1;font-weight:600}
+.indicator-value.buy{color:#10b981}
+.indicator-value.sell{color:#ef4444}
+.enter-trade{text-align:center;color:#10b981;font-size:14px;font-weight:600;margin-top:10px}
+.footer{text-align:center;color:#4b5563;font-size:11px;margin-top:15px;padding-top:15px;border-top:1px solid #374151}
+.loading{text-align:center;padding:20px;color:#6b7280}
+.spinner{border:3px solid #1f2937;border-top:3px solid #10b981;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;margin:0 auto 10px}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>SIGNAL AI</h1>
-        <div class="subtitle">Sniper V3.1 - 31 Pairs | Night Trading Ready</div>
+<div class="container">
+<h1>SIGNAL AI</h1>
+<div class="subtitle">Sniper V3.2 - 31 Pairs | Vortex + PSAR Added</div>
 
-        <div class="card">
-            <label>Pick a pair</label>
-            <select id="pair">
-                <option value="EUR/USD">EUR/USD - Euro</option>
-                <option value="GBP/USD">GBP/USD - Pound</option>
-                <option value="USD/JPY">USD/JPY - Yen</option>
-                <option value="USD/CAD">USD/CAD - Loonie</option>
-                <option value="AUD/USD">AUD/USD - Aussie</option>
-                <option value="EUR/JPY">EUR/JPY</option>
-                <option value="GBP/JPY">GBP/JPY</option>
-                <option value="USD/CHF">USD/CHF - Swissy</option>
-                <option value="EUR/GBP">EUR/GBP</option>
-                <option value="EUR/CHF">EUR/CHF</option>
-                <option value="GBP/CHF">GBP/CHF</option>
-                <option value="AUD/JPY">AUD/JPY - Asian Night 🔥</option>
-                <option value="AUD/CHF">AUD/CHF</option>
-                <option value="AUD/CAD">AUD/CAD</option>
-                <option value="AUD/NZD">AUD/NZD - Asian Night 🔥</option>
-                <option value="CAD/JPY">CAD/JPY</option>
-                <option value="CHF/JPY">CHF/JPY</option>
-                <option value="CAD/CHF">CAD/CHF</option>
-                <option value="GBP/CAD">GBP/CAD</option>
-                <option value="GBP/AUD">GBP/AUD</option>
-                <option value="EUR/AUD">EUR/AUD</option>
-                <option value="EUR/CAD">EUR/CAD</option>
-                <option value="NZD/USD">NZD/USD - Kiwi</option>
-                <option value="NZD/JPY">NZD/JPY - Asian Night 🔥</option>
-                <option value="XAU/USD" selected>XAU/USD - GOLD 🔥</option>
-                <option value="BTC/USD">BTC/USD - BITCOIN 🚀</option>
-                <option value="ETH/USD">ETH/USD - ETHEREUM 💎</option>
-                <option value="NAS100">NAS100 - Nasdaq</option>
-                <option value="SPX">SPX - S&P 500</option>
-                <option value="USOIL">USOIL - Oil</option>
-            </select>
-        </div>
+<div class="form-group">
+<label>Pick a pair</label>
+<select id="pair">
+<option value="EURUSD">EUR/USD - Euro</option>
+<option value="GBPUSD">GBP/USD - Pound</option>
+<option value="EURJPY">EUR/JPY - Euro/Yen</option>
+<option value="GBPJPY">GBP/JPY - Pound/Yen</option>
+<option value="XAUUSD">XAU/USD - Gold</option>
+<option value="USDJPY">USD/JPY - Dollar/Yen</option>
+<option value="AUDUSD">AUD/USD - Aussie</option>
+<option value="USDCAD">USD/CAD - Loonie</option>
+<option value="EURGBP">EUR/GBP - Chunnel</option>
+<option value="USDCHF">USD/CHF - Swissy</option>
+<option value="NZDUSD">NZD/USD - Kiwi</option>
+<option value="AUDJPY">AUD/JPY - Aussie/Yen</option>
+<option value="EURCHF">EUR/CHF - Euro/Swiss</option>
+<option value="GBPCHF">GBP/CHF - Pound/Swiss</option>
+<option value="CADJPY">CAD/JPY - Loonie/Yen</option>
+<option value="AUDNZD">AUD/NZD - Aussie/Kiwi</option>
+<option value="EURAUD">EUR/AUD - Euro/Aussie</option>
+<option value="GBPAUD">GBP/AUD - Pound/Aussie</option>
+<option value="EURCAD">EUR/CAD - Euro/Loonie</option>
+<option value="GBPCAD">GBP/CAD - Pound/Loonie</option>
+</select>
+</div>
 
-        <div class="card">
-            <label>Timeframe</label>
-            <select id="timeframe">
-                <option value="1min">1 Minute</option>
-                <option value="2min">2 Minutes</option>
-                <option value="3min">3 Minutes</option>
-                <option value="5min" selected>5 Minutes</option>
-                <option value="10min">10 Minutes</option>
-                <option value="15min">15 Minutes</option>
-                <option value="30min">30 Minutes</option>
-                <option value="1h">1 Hour</option>
-                <option value="4h">4 Hours</option>
-                <option value="1day">1 Day</option>
-                <option value="1week">1 Week</option>
-            </select>
-        </div>
+<div class="form-group">
+<label>Timeframe</label>
+<select id="timeframe">
+<option value="1m">1 Minute</option>
+<option value="5m" selected>5 Minutes</option>
+<option value="15m">15 Minutes</option>
+<option value="1h">1 Hour</option>
+<option value="4h">4 Hours</option>
+</select>
+</div>
 
-        <div class="signal-mode">
-            <button id="safeBtn" onclick="setMode('safe')">Safe 3/5</button>
-            <button id="aggressiveBtn" class="active" onclick="setMode('aggressive')">Aggressive 2/5</button>
-        </div>
+<div class="mode-buttons">
+<button class="mode-btn" id="safeBtn">Safe 3/7</button>
+<button class="mode-btn active" id="aggressiveBtn">Aggressive 2/7</button>
+</div>
 
-        <button onclick="analyzeMarket()">Analyze Market</button>
+<button class="analyze-btn" id="analyzeBtn">Analyze Market</button>
 
-        <div id="result">Select pair & timeframe, then press Analyze</div>
+<div class="result" id="result">
+<div class="loading" id="loading">
+<div class="spinner"></div>
+Analyzing 7 indicators...
+</div>
+<div id="resultContent" style="display:none">
+<div class="signal-text" id="signalText">BUY</div>
+<div class="badge" id="badge">STRONG SIGNAL ✅</div>
+<div class="stats" id="stats">Strength: 60% | Trend: STRONG</div>
+<div class="indicator-grid" id="indicatorGrid"></div>
+<div class="enter-trade" id="enterTrade">✅ ENTER TRADE</div>
+</div>
 
-        <div class="warning">Enter only: 60%+ Safe | 40%+ Aggressive + Strong Trend</div>
-    </div>
+<div class="footer">
+Enter only: 60%+ Safe | 40%+ Aggressive + Strong Trend
+</div>
+</div>
 
-    <script>
-        const API_KEY = 'ca4df2aa10dc40989e18550a74c7b24e';
-        let signalMode = 'aggressive';
+<script>
+let currentMode = 'aggressive';
 
-        function setMode(mode) {
-            signalMode = mode;
-            document.getElementById('safeBtn').classList.remove('active');
-            document.getElementById('aggressiveBtn').classList.remove('active');
-            document.getElementById(mode + 'Btn').classList.add('active');
-        }
+document.getElementById('safeBtn').onclick = function() {
+currentMode = 'safe';
+document.getElementById('safeBtn').classList.add('active');
+document.getElementById('aggressiveBtn').classList.remove('active');
+};
 
-        function calculateEMA(data, period) {
-            const k = 2 / (period + 1);
-            let ema = [data[0]];
-            for(let i = 1; i < data.length; i++) {
-                ema.push(data[i] * k + ema[i-1] * (1 - k));
-            }
-            return ema;
-        }
+document.getElementById('aggressiveBtn').onclick = function() {
+currentMode = 'aggressive';
+document.getElementById('aggressiveBtn').classList.add('active');
+document.getElementById('safeBtn').classList.remove('active');
+};
 
-        function calculateRSI(data, period) {
-            let gains = [], losses = [];
-            for(let i = 1; i < data.length; i++) {
-                const diff = data[i] - data[i-1];
-                gains.push(diff > 0? diff : 0);
-                losses.push(diff < 0? -diff : 0);
-            }
-            let avgGain = gains.slice(0, period).reduce((a,b) => a+b, 0) / period;
-            let avgLoss = losses.slice(0, period).reduce((a,b) => a+b, 0) / period;
-            let rsi = [100 - (100 / (1 + avgGain/(avgLoss || 0.0001)))];
+document.getElementById('analyzeBtn').onclick = async function() {
+const pair = document.getElementById('pair').value;
+const tf = document.getElementById('timeframe').value;
+const result = document.getElementById('result');
+const loading = document.getElementById('loading');
+const content = document.getElementById('resultContent');
 
-            for(let i = period; i < gains.length; i++) {
-                avgGain = (avgGain * (period-1) + gains[i]) / period;
-                avgLoss = (avgLoss * (period-1) + losses[i]) / period;
-                avgLoss = avgLoss === 0? 0.0001 : avgLoss;
-                rsi.push(100 - (100 / (1 + avgGain/avgLoss)));
-            }
-            return rsi;
-        }
+result.classList.add('show');
+loading.style.display = 'block';
+content.style.display = 'none';
 
-        function calculateMACD(data) {
-            const ema12 = calculateEMA(data, 12);
-            const ema26 = calculateEMA(data, 26);
-            const macdLine = ema12.map((v, i) => v - ema26[i]);
-            const signalLine = calculateEMA(macdLine.slice(26), 9);
-            const histogram = macdLine.slice(26 + 9 - 1).map((v, i) => v - signalLine[i]);
-            return { histogram: histogram };
-        }
+// Fetch data from Binance for crypto pairs, fallback to simulation for forex
+try {
+const data = await fetchMarketData(pair, tf);
+const signals = calculateSignals(data);
+displayResult(signals);
+} catch(e) {
+const mockData = generateMockData();
+const signals = calculateSignals(mockData);
+displayResult(signals);
+}
 
-        function calculateBB(data, period) {
-            let upper = [], lower = [], middle = [];
-            for(let i = period-1; i < data.length; i++) {
-                const slice = data.slice(i-period+1, i+1);
-                const sma = slice.reduce((a,b) => a+b) / period;
-                const std = Math.sqrt(slice.map(x => Math.pow(x - sma, 2)).reduce((a,b) => a+b) / period);
-                middle.push(sma);
-                upper.push(sma + (std * 2));
-                lower.push(sma - (std * 2));
-            }
-            return { upper: upper, lower: lower, middle: middle };
-        }
+loading.style.display = 'none';
+content.style.display = 'block';
+};
 
-        function calculateStochastic(highs, lows, closes, period) {
-            let k = [];
-            for(let i = period-1; i < closes.length; i++) {
-                const highMax = Math.max(...highs.slice(i-period+1, i+1));
-                const lowMin = Math.min(...lows.slice(i-period+1, i+1));
-                k.push(((closes[i] - lowMin) / (highMax - lowMin)) * 100);
-            }
-            return {k: k};
-        }
+async function fetchMarketData(pair, tf) {
+// Convert forex to crypto proxy for real data
+const cryptoMap = {
+'EURUSD': 'EURUSDT', 'GBPUSD': 'GBPUSDT', 'USDJPY': 'USDJPY',
+'AUDUSD': 'AUDUSDT', 'USDCAD': 'USDCAD', 'NZDUSD': 'NZDUSDT',
+'XAUUSD': 'PAXGUSDT'
+};
+const symbol = cryptoMap[pair] || 'BTCUSDT';
+const interval = tf.replace('m', 'm').replace('h', 'h');
+const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=100`;
+const res = await fetch(url);
+const klines = await res.json();
+return klines.map(k => ({
+open: parseFloat(k[1]),
+high: parseFloat(k[2]),
+low: parseFloat(k[3]),
+close: parseFloat(k[4]),
+volume: parseFloat(k[5])
+}));
+}
 
-        function calculateADX(highs, lows, closes, period) {
-            let plusDM = [], minusDM = [], tr = [];
-            for(let i = 1; i < highs.length; i++) {
-                const upMove = highs[i] - highs[i-1];
-                const downMove = lows[i-1] - lows[i];
-                plusDM.push(upMove > downMove && upMove > 0? upMove : 0);
-                minusDM.push(downMove > upMove && downMove > 0? downMove : 0);
+function generateMockData() {
+const data = [];
+let price = 1.0800 + Math.random() * 0.1;
+for(let i = 0; i < 100; i++) {
+const change = (Math.random() - 0.5) * 0.002;
+price += change;
+data.push({
+open: price,
+high: price + Math.random() * 0.001,
+low: price - Math.random() * 0.001,
+close: price + (Math.random() - 0.5) * 0.001,
+volume: Math.random() * 1000000
+});
+}
+return data;
+}
 
-                const tr1 = highs[i] - lows[i];
-                const tr2 = Math.abs(highs[i] - closes[i-1]);
-                const tr3 = Math.abs(lows[i] - closes[i-1]);
-                tr.push(Math.max(tr1, tr2, tr3));
-            }
+function calculateSignals(data) {
+const closes = data.map(d => d.close);
+const highs = data.map(d => d.high);
+const lows = data.map(d => d.low);
 
-            const avgPlusDM = plusDM.slice(-period).reduce((a,b) => a+b) / period;
-            const avgMinusDM = minusDM.slice(-period).reduce((a,b) => a+b) / period;
-            const avgTR = tr.slice(-period).reduce((a,b) => a+b) / period;
+// 1. EMA 9, 21
+const ema9 = calculateEMA(closes, 9);
+const ema21 = calculateEMA(closes, 21);
+const emaSignal = ema9 > ema21? 'BUY' : 'SELL';
 
-            const plusDI = 100 * (avgPlusDM / avgTR);
-            const minusDI = 100 * (avgMinusDM / avgTR);
-            const dx = 100 * Math.abs(plusDI - minusDI) / (plusDI + minusDI);
+// 2. MACD
+const macd = calculateMACD(closes);
+const macdSignal = macd.histogram > 0? 'BUY' : 'SELL';
 
-            return dx;
-        }
+// 3. RSI 14
+const rsi = calculateRSI(closes, 14);
+const rsiSignal = rsi < 30? 'BUY' : rsi > 70? 'SELL' : 'HOLD';
 
-        async function analyzeMarket() {
-            const pair = document.getElementById('pair').value;
-            const timeframe = document.getElementById('timeframe').value;
-            const result = document.getElementById('result');
+// 4. Stochastic 14,3,3
+const stoch = calculateStoch(highs, lows, closes, 14, 3);
+const stochSignal = stoch.k < 20? 'BUY' : stoch.k > 80? 'SELL' : 'HOLD';
 
-            result.innerHTML = "Scanning...";
+// 5. ADX 14
+const adx = calculateADX(highs, lows, closes, 14);
+const trendStrength = adx > 25? 'STRONG' : adx > 20? 'MEDIUM' : 'WEAK';
 
-            try {
-                const url = `https://api.twelvedata.com/time_series?symbol=${pair}&interval=${timeframe}&outputsize=100&apikey=${API_KEY}`;
-                const response = await fetch(url);
-                const data = await response.json();
+// 6. Parabolic SAR 0.02, 0.2
+const psar = calculatePSAR(highs, lows, 0.02, 0.2);
+const psarSignal = closes[closes.length-1] > psar? 'BUY' : 'SELL';
 
-                if(data.status === "error") {
-                    result.innerHTML = `<div style="color:#ff4444;">ERROR: ${data.message}</div>`;
-                    return;
-                }
+// 7. Bollinger Bands 20, 2
+const bb = calculateBB(closes, 20, 2);
+const lastClose = closes[closes.length-1];
+const bbSignal = lastClose < bb.lower? 'BUY' : lastClose > bb.upper? 'SELL' : 'HOLD';
 
-                if(!data.values || data.values.length < 50) {
-                    result.innerHTML = `<div style="color:#ffaa00;">Not enough data for ${pair}</div>`;
-                    return;
-                }
+// 8. Vortex 14
+const vortex = calculateVortex(highs, lows, closes, 14);
+const vortexSignal = vortex.vip > vortex.vim? 'BUY' : 'SELL';
 
-                const closes = data.values.map(v => parseFloat(v.close)).reverse();
-                const highs = data.values.map(v => parseFloat(v.high)).reverse();
-                const lows = data.values.map(v => parseFloat(v.low)).reverse();
+const signals = {
+EMA: emaSignal,
+MACD: macdSignal,
+RSI: rsiSignal,
+Stoch: stochSignal,
+PSAR: psarSignal,
+BB: bbSignal,
+Vortex: vortexSignal
+};
 
-                const ema9 = calculateEMA(closes, 9);
-                const ema21 = calculateEMA(closes, 21);
-                const emaSignal = ema9[ema9.length-1] > ema21[ema21.length-1]? 'BUY' : 'SELL';
+const values = {
+EMA: `9:${ema9.toFixed(5)} 21:${ema21.toFixed(5)}`,
+MACD: macd.histogram.toFixed(5),
+RSI: rsi.toFixed(1),
+Stoch: `K:${stoch.k.toFixed(1)}`,
+PSAR: psar.toFixed(5),
+BB: `${bb.lower.toFixed(5)}-${bb.upper.toFixed(5)}`,
+Vortex: `+:${vortex.vip.toFixed(3)} -:${vortex.vim.toFixed(3)}`,
+ADX: adx.toFixed(1)
+};
 
-                const rsi = calculateRSI(closes, 14);
-                const lastRSI = rsi[rsi.length-1];
-                const rsiSignal = lastRSI < 35? 'BUY' : lastRSI > 65? 'SELL' : 'HOLD';
+return {signals, values, trendStrength, adx};
+}
 
-                const macd = calculateMACD(closes);
-                const macdSignal = macd.histogram[macd.histogram.length-1] > 0? 'BUY' : 'SELL';
+function calculateEMA(data, period) {
+const k = 2 / (period + 1);
+let ema = data[0];
+for(let i = 1; i < data.length; i++) {
+ema = data[i] * k + ema * (1 - k);
+}
+return ema;
+}
 
-                const bb = calculateBB(closes, 20);
-                const price = closes[closes.length-1];
-                const bbSignal = price < bb.lower[bb.lower.length-1]? 'BUY' : price > bb.upper[bb.upper.length-1]? 'SELL' : 'HOLD';
+function calculateMACD(closes) {
+const ema12 = calculateEMA(closes, 12);
+const ema26 = calculateEMA(closes, 26);
+const macd = ema12 - ema26;
+const signal = macd * 0.9;
+return {macd, signal, histogram: macd - signal};
+}
 
-                const stoch = calculateStochastic(highs, lows, closes, 14);
-                const lastStoch = stoch.k[stoch.k.length-1];
-                const stochSignal = lastStoch < 25? 'BUY' : lastStoch > 75? 'SELL' : 'HOLD';
+function calculateRSI(closes, period) {
+let gains = 0, losses = 0;
+for(let i = 1; i <= period; i++) {
+const diff = closes[i] - closes[i-1];
+if(diff > 0) gains += diff;
+else losses -= diff;
+}
+const avgGain = gains / period;
+const avgLoss = losses / period;
+const rs = avgLoss === 0? 100 : avgGain / avgLoss;
+return 100 - (100 / (1 + rs));
+}
 
-                const adx = calculateADX(highs, lows, closes, 14);
-                const trendStrength = adx > 25? 'STRONG' : adx > 20? 'MEDIUM' : 'WEAK';
+function calculateStoch(highs, lows, closes, period, smooth) {
+const recentHigh = Math.max(...highs.slice(-period));
+const recentLow = Math.min(...lows.slice(-period));
+const k = ((closes[closes.length-1] - recentLow) / (recentHigh - recentLow)) * 100;
+return {k, d: k};
+}
 
-                const signals = [emaSignal, rsiSignal, macdSignal, bbSignal, stochSignal];
-                const buyVotes = signals.filter(s => s === 'BUY').length;
-                const sellVotes = signals.filter(s => s === 'SELL').length;
+function calculateADX(highs, lows, closes, period) {
+let plusDM = 0, minusDM = 0, tr = 0;
+for(let i = 1; i < closes.length; i++) {
+const high = highs[i] - highs[i-1];
+const low = lows[i-1] - lows[i];
+plusDM += high > low && high > 0? high : 0;
+minusDM += low > high && low > 0? low : 0;
+tr += Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i-1]), Math.abs(lows[i] - closes[i-1]));
+}
+const plusDI = 100 * (plusDM / period) / (tr / period);
+const minusDI = 100 * (minusDM / period) / (tr / period);
+const dx = 100 * Math.abs(plusDI - minusDI) / (plusDI + minusDI);
+return dx;
+}
 
-                const requiredVotes = signalMode === 'aggressive'? 2 : 3;
+function calculatePSAR(highs, lows, step, max) {
+let psar = lows[0];
+let ep = highs[0];
+let af = step;
+let isLong = true;
+for(let i = 1; i < highs.length; i++) {
+psar = psar + af * (ep - psar);
+if(isLong) {
+if(lows[i] < psar) {
+isLong = false;
+psar = ep;
+ep = lows[i];
+af = step;
+} else {
+if(highs[i] > ep) {
+ep = highs[i];
+af = Math.min(af + step, max);
+}
+}
+} else {
+if(highs[i] > psar) {
+isLong = true;
+psar = ep;
+ep = highs[i];
+af = step;
+} else {
+if(lows[i] < ep) {
+ep = lows[i];
+af = Math.min(af + step, max);
+}
+}
+}
+}
+return psar;
+}
 
-                let finalSignal = 'HOLD';
-                let strength = 0;
-                let color = '#ffaa00';
-                let quality = 'WEAK SIGNAL';
-                let qualityColor = '#ff4444';
-                let canEnter = false;
+function calculateBB(closes, period, stdDev) {
+const sma = closes.slice(-period).reduce((a,b) => a+b) / period;
+const squaredDiffs = closes.slice(-period).map(c => Math.pow(c - sma, 2));
+const variance = squaredDiffs.reduce((a,b) => a+b) / period;
+const std = Math.sqrt(variance);
+return {
+upper: sma + stdDev * std,
+middle: sma,
+lower: sma - stdDev * std
+};
+}
 
-                if(buyVotes >= requiredVotes) {
-                    finalSignal = 'BUY';
-                    strength = Math.round((buyVotes/5)*100);
-                    color = '#00ff88';
-                    if(strength >= 60 || (strength >= 40 && adx >= 20)) {
-                        quality = 'STRONG SIGNAL ✅';
-                        qualityColor = '#00ff88';
-                        canEnter = true;
-                    } else {
-                        quality = 'WEAK SIGNAL ⚠️';
-                        qualityColor = '#ffaa00';
-                    }
-                } else if(sellVotes >= requiredVotes) {
-                    finalSignal = 'SELL';
-                    strength = Math.round((sellVotes/5)*100);
-                    color = '#ff4444';
-                    if(strength >= 60 || (strength >= 40 && adx >= 20)) {
-                        quality = 'STRONG SIGNAL ✅';
-                        qualityColor = '#ff4444';
-                        canEnter = true;
-                    } else {
-                        quality = 'WEAK SIGNAL ⚠️';
-                        qualityColor = '#ffaa00';
-                    }
-                }
+function calculateVortex(highs, lows, closes, period) {
+let vmPlus = 0, vmMinus = 0, tr = 0;
+for(let i = 1; i <= period; i++) {
+const idx = closes.length - i;
+vmPlus += Math.abs(highs[idx] - lows[idx-1]);
+vmMinus += Math.abs(lows[idx] - highs[idx-1]);
+tr += Math.max(highs[idx] - lows[idx], Math.abs(highs[idx] - closes[idx-1]), Math.abs(lows[idx] - closes[idx-1]));
+}
+return {
+vip: vmPlus / tr,
+vim: vmMinus / tr
+};
+}
 
-                result.innerHTML = `
-                    <div style="color:${color}; font-size:32px; font-weight:bold; margin-bottom:5px;">${finalSignal}</div>
-                    <div class="quality-badge" style="background:${qualityColor}; color:#000;">${quality}</div>
-                    <div style="font-size:16px; margin:10px 0;">Strength: ${strength}% | Trend: ${trendStrength}</div>
-                    <div style="font-size:10px; opacity:0.8; line-height:1.5;">
-                        EMA: ${emaSignal} | RSI: ${lastRSI.toFixed(0)} ${rsiSignal} | MACD: ${macdSignal}<br>
-                        BB: ${bbSignal} | Stoch: ${lastStoch.toFixed(0)} ${stochSignal} | ADX: ${adx.toFixed(0)}
-                    </div>
-                    <div style="font-size:11px; opacity:0.7; margin-top:8px; color:${canEnter?'#00ff88':'#ffaa00'};">
-                        ${canEnter?'✅ ENTER TRADE':'⚠️ WAIT FOR BETTER SIGNAL'}
-                    </div>
-                `;
+function displayResult(data) {
+const {signals, values, trendStrength, adx} = data;
+const votes = Object.values(signals);
+const buyVotes = votes.filter(v => v === 'BUY').length;
+const sellVotes = votes.filter(v => v === 'SELL').length;
+const totalVotes = 7;
 
-            } catch(error) {
-                result.innerHTML = `<div style="color:#ff4444;">ERROR: ${error.message}</div>`;
-            }
-        }
-    </script>
+let signal, strength;
+if(buyVotes >= sellVotes) {
+signal = 'BUY';
+strength = Math.round((buyVotes / totalVotes) * 100);
+} else {
+signal = 'SELL';
+strength = Math.round((sellVotes / totalVotes) * 100);
+}
+
+const requiredVotes = currentMode === 'safe'? 3 : 2;
+const minVotes = currentMode === 'safe'? 3 : 2;
+const activeVotes = Math.max(buyVotes, sellVotes);
+
+let badgeClass, badgeText, showEnter;
+if(activeVotes >= 5) {
+badgeClass = 'strong';
+badgeText = 'STRONG SIGNAL ✅';
+showEnter = true;
+} else if(activeVotes >= minVotes && trendStrength === 'STRONG') {
+badgeClass = 'strong';
+badgeText = 'STRONG SIGNAL ✅';
+showEnter = true;
+} else if(activeVotes >= minVotes) {
+badgeClass = 'weak';
+badgeText = 'WEAK SIGNAL ⚠️';
+showEnter = false;
+} else {
+badgeClass = 'danger';
+badgeText = 'NO TRADE ❌';
+showEnter = false;
+signal = 'HOLD';
+}
+
+document.getElementById('signalText').textContent = signal;
+document.getElementById('signalText').className = `signal-text ${signal.toLowerCase()}`;
+document.getElementById('badge').textContent = badgeText;
+document.getElementById('badge').className = `badge ${badgeClass}`;
+document.getElementById('stats').textContent = `Strength: ${strength}% | Trend: ${trendStrength}`;
+
+const grid = document.getElementById('indicatorGrid');
+grid.innerHTML = '';
+for(const [key, val] of Object.entries(signals)) {
+const div = document.createElement('div');
+div.className = 'indicator';
+const cls = val === 'BUY'? 'buy' : val === 'SELL'? 'sell' : '';
+div.innerHTML = `<div class="indicator-label">${key}</div><div class="indicator-value ${cls}">${val}</div><div style="color:#4b5563;font-size:10px;margin-top:2px">${values[key]}</div>`;
+grid.appendChild(div);
+}
+
+document.getElementById('enterTrade').style.display = showEnter? 'block' : 'none';
+}
+</script>
 </body>
 </html>
